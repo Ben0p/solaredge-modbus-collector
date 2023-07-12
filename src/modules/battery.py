@@ -111,7 +111,10 @@ def read_modbus_data(
         # 0x82 - 2 - SoH %
         battery_SoH = decoder.decode_32bit_float()
         # 0x84 - 2 - SoC %
-        battery_SoC = tools.validate(decoder.decode_32bit_float(), ">=", 0.0)
+        try:
+            battery_SoC = tools.validate(decoder.decode_32bit_float(), ">=", 0.0)
+        except ValueError:
+            battery_SoC = None
         battery_SoC = tools.validate(battery_SoC, "<", 101)
 
         data[prefix + "temp_avg"] = round(tempavg, 1)

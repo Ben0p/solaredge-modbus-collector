@@ -102,7 +102,7 @@ def read_modbus_data(
     acvarsf = decoder.decode_16bit_int()
     acvar = tools.calculate_value(acvar, acvarsf)
 
-    data["acvar"] = round(acvar, abs(acvarsf))
+    data["acvar"] = float(round(acvar, abs(acvarsf)))
 
     acpf = decoder.decode_16bit_int()
     acpfsf = decoder.decode_16bit_int()
@@ -115,19 +115,22 @@ def read_modbus_data(
     acenergy = tools.validate(
         tools.calculate_value(acenergy, acenergysf), ">", 0)
 
-    data["acenergy"] = round(acenergy * 0.001, 3)
+    try:
+        data["acenergy"] = round(acenergy * 0.001, 3)
+    except OverflowError:
+        data["acenergy"] = None
 
     dccurrent = decoder.decode_16bit_uint()
     dccurrentsf = decoder.decode_16bit_int()
     dccurrent = tools.calculate_value(dccurrent, dccurrentsf)
 
-    data["dccurrent"] = round(dccurrent, abs(dccurrentsf))
+    data["dccurrent"] = float(round(dccurrent, abs(dccurrentsf)))
 
     dcvoltage = decoder.decode_16bit_uint()
     dcvoltagesf = decoder.decode_16bit_int()
     dcvoltage = tools.calculate_value(dcvoltage, dcvoltagesf)
 
-    data["dcvoltage"] = round(dcvoltage, abs(dcvoltagesf))
+    data["dcvoltage"] = float(round(dcvoltage, abs(dcvoltagesf)))
 
     dcpower = decoder.decode_16bit_int()
     dcpowersf = decoder.decode_16bit_int()

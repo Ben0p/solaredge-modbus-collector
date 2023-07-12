@@ -1,3 +1,4 @@
+import env
 import operator
 
 from pymodbus.client import ModbusTcpClient
@@ -15,7 +16,7 @@ def connect(
 	'''
 	Connect to the SolarEdge Energy Hub Inverter
 	'''
-	client = ModbusTcpClient(host="10.1.1.105", port=1502)
+	client = ModbusTcpClient(host=env.INVERTER_IP, port=env.MODBUS_PORT)
 	client.connect()
 	return (client)
 
