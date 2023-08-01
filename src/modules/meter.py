@@ -3,12 +3,14 @@ import env
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 
-from modules import const, tools
+from utils import tools, modbus
+
 
 
 '''
 Module for reading the modbus values for a meter
 '''
+
 
 
 def read_modbus_data(
@@ -24,7 +26,7 @@ def read_modbus_data(
 
     data = {}
 
-    modbus_data = tools.read_holding_registers(
+    modbus_data = modbus.read_holding_registers(
         client=client,
         address=address,
         count=count,
@@ -173,23 +175,35 @@ def read_modbus_data(
         data[prefix + "acpfb"] = round(acpfb, abs(acpfsf))
         data[prefix + "acpfc"] = round(acpfc, abs(acpfsf))
 
-    exported = decoder.decode_32bit_uint()
+    
     exporteda = decoder.decode_32bit_uint()
     exportedb = decoder.decode_32bit_uint()
     exportedc = decoder.decode_32bit_uint()
-    imported = decoder.decode_32bit_uint()
+    
     importeda = decoder.decode_32bit_uint()
     importedb = decoder.decode_32bit_uint()
     importedc = decoder.decode_32bit_uint()
     energywsf = decoder.decode_16bit_int()
 
-    exported = tools.validate(
-        tools.calculate_value(exported, energywsf), ">", 0)
+    # Exported
+    exported = decoder.decode_32bit_uint()
+    if exported < 0:
+        exported = 0
+    # exported = tools.validate(
+    #     tools.calculate_value(exported, energywsf), ">", 0)
+
+    # Imported
+    imported = decoder.decode_32bit_uint()
+    if imported < 0:
+        imported = 0
+    # imported = tools.validate(
+    #     tools.calculate_value(imported, energywsf), ">", 0)
+
+
     exporteda = tools.calculate_value(exporteda, energywsf)
     exportedb = tools.calculate_value(exportedb, energywsf)
     exportedc = tools.calculate_value(exportedc, energywsf)
-    imported = tools.validate(
-        tools.calculate_value(imported, energywsf), ">", 0)
+
     importeda = tools.calculate_value(importeda, energywsf)
     importedb = tools.calculate_value(importedb, energywsf)
     importedc = tools.calculate_value(importedc, energywsf)

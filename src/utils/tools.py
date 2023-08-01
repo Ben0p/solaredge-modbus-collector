@@ -1,36 +1,11 @@
-import env
 import operator
 
-from pymodbus.client import ModbusTcpClient
 
 
 '''
-Various function tools
+Various helper tools
 '''
 
-
-def connect(
-          host: str,
-          port: int
-	):
-	'''
-	Connect to the SolarEdge Energy Hub Inverter
-	'''
-	client = ModbusTcpClient(host=env.INVERTER_IP, port=env.MODBUS_PORT)
-	client.connect()
-	return (client)
-
-
-def read_holding_registers(
-		client: ModbusTcpClient,
-        address: int,
-        count: int,
-        slave: int
-	):
-	registers = client.read_holding_registers(
-        address=address, count=count, slave=slave
-    )
-	return(registers)
 
 
 def validate(value, comparison, against):

@@ -1,14 +1,14 @@
-import env
-
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 
-from modules import const, tools
+from utils import const, tools, modbus
+
 
 
 '''
 Module for reading the modbus values for a battery
 '''
+
 
 
 def read_modbus_data(
@@ -24,7 +24,7 @@ def read_modbus_data(
 
     data = {}
 
-    modbus_data = tools.read_holding_registers(
+    modbus_data = modbus.read_holding_registers(
         client=client,
         address=address,
         count=count,
@@ -76,7 +76,7 @@ def read_modbus_data(
         # 0x4A - 2 - max discharge peak power
         data[prefix + "max_power_peak_discharge"] = decoder.decode_32bit_float()
 
-        storage_data = tools.read_holding_registers(
+        storage_data = modbus.read_holding_registers(
             client=client,
             address=address + 0x6C,
             count=28,
@@ -110,12 +110,15 @@ def read_modbus_data(
         battery_availbable = decoder.decode_32bit_float()
         # 0x82 - 2 - SoH %
         battery_SoH = decoder.decode_32bit_float()
+        
         # 0x84 - 2 - SoC %
-        try:
-            battery_SoC = tools.validate(decoder.decode_32bit_float(), ">=", 0.0)
-        except ValueError:
-            battery_SoC = None
-        battery_SoC = tools.validate(battery_SoC, "<", 101)
+        battery_SoC  = decoder.decode_32bit_float()
+        if battery_SoC > 100:
+            battery_SoC = 100.0
+        if battery_SoC < 0:
+            battery_SoC = 0.0
+        data[prefix + "state_of_charge"] = round(battery_SoC, 2)
+        
 
         data[prefix + "temp_avg"] = round(tempavg, 1)
         data[prefix + "temp_max"] = round(tempmax, 1)
@@ -132,7 +135,7 @@ def read_modbus_data(
         data[prefix +
              "size_available"] = round(battery_availbable, 3)
         data[prefix + "state_of_health"] = round(battery_SoH, 0)
-        data[prefix + "state_of_charge"] = round(battery_SoC, 0)
+        
         battery_status = decoder.decode_32bit_uint()
 
         # voltage and current are bogus in certain statuses

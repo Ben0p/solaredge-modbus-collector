@@ -3,7 +3,7 @@ import env
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 
-from modules import const, tools
+from utils import tools, modbus
 
 
 
@@ -25,7 +25,7 @@ def read_modbus_data(
 
     data = {}
 
-    modbus_data = tools.read_holding_registers(
+    modbus_data = modbus.read_holding_registers(
         client=client,
         address=address,
         count=count,
@@ -36,7 +36,8 @@ def read_modbus_data(
         return False
 
     decoder = BinaryPayloadDecoder.fromRegisters(
-        modbus_data.registers, byteorder=Endian.Big
+        modbus_data.registers,
+        byteorder=Endian.Big
     )
     accurrent = decoder.decode_16bit_uint()
     accurrenta = decoder.decode_16bit_uint()

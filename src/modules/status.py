@@ -3,7 +3,14 @@ import env
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 
-from modules import const, tools
+from utils import const, tools, modbus
+
+
+
+'''
+Process the inverter status registers
+'''
+
 
 
 def read_modbus_data(
@@ -24,7 +31,7 @@ def read_modbus_data(
 	else:
 		return True  # Nothing to read here
 
-	modbus_data = tools.read_holding_registers(
+	modbus_data = modbus.read_holding_registers(
         client=client,
         address=address,
         count=count,

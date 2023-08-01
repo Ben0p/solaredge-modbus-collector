@@ -1,8 +1,11 @@
 import env
-from modules import const, tools, inverter, meter, battery, status, influx
-
 import pymodbus
 import time
+
+from utils import influx, modbus
+from modules import inverter, meter, battery, status
+
+
 
 '''
 SolarEdge Modbus TCP Collector
@@ -11,18 +14,20 @@ Modbus must be enabled on inverter
 '''
 
 
+
 def run():
 
     while True:
         # Initialize modbus connection
-        modbus_client = tools.connect(env.INVERTER_IP, env.MODBUS_PORT)
+        modbus_client = modbus.connect(env.INVERTER_IP, env.MODBUS_PORT)
         print("Connected to Inverter Modbus TCP")
+
 
         # Initialize InfluxDB connection
         influx_write_api = influx.connect(
             env.INFLUX_URL, env.INFLUX_TOKEN, env.INFLUX_ORG)
         print("Connected to InfluxDB")
-        
+
 
         while True:
             print("-"*50)
@@ -43,7 +48,7 @@ def run():
                 break
 
             if inverter_data:
-                influx.wrtie(
+                influx.write(
                     write_api=influx_write_api,
                     bucket=env.INFLUX_BUCKET,
                     org=env.INFLUX_ORG,
@@ -74,7 +79,7 @@ def run():
                 break
 
             if m1_data:
-                influx.wrtie(
+                influx.write(
                     write_api=influx_write_api,
                     bucket=env.INFLUX_BUCKET,
                     org=env.INFLUX_ORG,
@@ -105,7 +110,7 @@ def run():
                 break
 
             if b1_data:
-                influx.wrtie(
+                influx.write(
                     write_api=influx_write_api,
                     bucket=env.INFLUX_BUCKET,
                     org=env.INFLUX_ORG,
@@ -132,7 +137,7 @@ def run():
                 break
 
             if status_data:
-                influx.wrtie(
+                influx.write(
                     write_api=influx_write_api,
                     bucket=env.INFLUX_BUCKET,
                     org=env.INFLUX_ORG,
