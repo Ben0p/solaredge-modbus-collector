@@ -2,7 +2,7 @@ import env
 
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
-
+from influxdb_client.rest import ApiException
 from utils import const, tools, modbus
 
 
@@ -51,7 +51,8 @@ def read_modbus_data(
 				export_control_mode
 			]
 		else:
-			data["export_control_mode"] = export_control_mode
+			#data["export_control_mode"] = export_control_mode
+			print(f"{export_control_mode=}")
 
 		# 0xE001 - 1 - Export control limit mode
 		export_control_limit_mode = decoder.decode_16bit_uint() & 1
@@ -78,7 +79,8 @@ def read_modbus_data(
 				storage_control_mode
 			]
 		else:
-			data["storage_contol_mode"] = storage_control_mode
+			# data["storage_contol_mode"] = storage_control_mode
+			print(f"{storage_control_mode=}")
 
 		# 0xE005 - 1 - storage ac charge policy
 		storage_ac_charge_policy = decoder.decode_16bit_uint()
@@ -87,7 +89,8 @@ def read_modbus_data(
 				storage_ac_charge_policy
 			]
 		else:
-			data["storage_ac_charge_policy"] = storage_ac_charge_policy
+			# data["storage_ac_charge_policy"] = storage_ac_charge_policy
+			print(f"{storage_ac_charge_policy=}")
 
 		# 0xE006 - 2 - storage AC charge limit (kWh or %)
 		data["storage_ac_charge_limit"] = round(
@@ -106,7 +109,8 @@ def read_modbus_data(
 				storage_default_mode
 			]
 		else:
-			data["storage_default_mode"] = storage_default_mode
+			# data["storage_default_mode"] = storage_default_mode
+			print(f"{storage_default_mode=}")
 
 		# 0xE00B - 2- storage remote command timeout (seconds)
 		data["storage_remote_command_timeout"] = decoder.decode_32bit_uint()
@@ -119,6 +123,10 @@ def read_modbus_data(
 			] = const.STOREDGE_CHARGE_DISCHARGE_MODE[storage_remote_command_mode]
 		else:
 			data["storage_remote_command_mode"] = storage_remote_command_mode
+			print(f"{storage_remote_command_mode=}")
+
+		if type(data["storage_remote_command_mode"]) == str:
+			data["storage_remote_command_mode"] = None
 
 		# 0xE00E - 2- storate remote charge limit
 		data["storage_remote_charge_limit"] = round(

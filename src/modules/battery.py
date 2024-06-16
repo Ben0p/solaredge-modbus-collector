@@ -39,13 +39,22 @@ def read_modbus_data(
         )
 
         # 0x00 - 16 - manufacturer
-        data[prefix + "manufacturer"] = tools.decode_string(decoder)
+        try:
+            data[prefix + "manufacturer"] = tools.decode_string(decoder)
+        except UnicodeDecodeError:
+             data[prefix + "manufacturer"] = None
 
         # 0x10 - 16 - model
-        data[prefix + "model"] = tools.decode_string(decoder)
+        try:
+            data[prefix + "model"] = tools.decode_string(decoder)
+        except UnicodeDecodeError:
+            data[prefix + "model"] = None
 
         # 0x20 - 16 - firmware version
-        data[prefix + "firmware_version"] = tools.decode_string(decoder)
+        try:
+            data[prefix + "firmware_version"] = tools.decode_string(decoder)
+        except UnicodeDecodeError:
+            data[prefix + "firmware_version"] = None
 
         # 0x30 - 16 - serial number
         data[prefix + "serial_number"] = tools.decode_string(decoder)
@@ -148,6 +157,7 @@ def read_modbus_data(
             data[prefix +
                  "status"] = const.BATTERY_STATUSSES[battery_status]
         else:
-            data[prefix + "status"] = battery_status
+            # data[prefix + "status"] = battery_status
+            print(f"{battery_status=}")
             
         return data

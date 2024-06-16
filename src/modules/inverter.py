@@ -2,6 +2,7 @@ import env
 
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
+import struct
 
 from utils import tools, modbus
 
@@ -97,64 +98,80 @@ def read_modbus_data(
     acvasf = decoder.decode_16bit_int()
     acva = tools.calculate_value(acva, acvasf)
 
-    data["acva"] = float(round(acva, abs(acvasf)))
-
-    acvar = decoder.decode_16bit_int()
-    acvarsf = decoder.decode_16bit_int()
-    acvar = tools.calculate_value(acvar, acvarsf)
-
-    data["acvar"] = float(round(acvar, abs(acvarsf)))
-
-    acpf = decoder.decode_16bit_int()
-    acpfsf = decoder.decode_16bit_int()
-    acpf = tools.calculate_value(acpf, acpfsf)
-
-    data["acpf"] = float(round(acpf, abs(acpfsf)))
-
-    acenergy = decoder.decode_32bit_uint()
-    acenergysf = decoder.decode_16bit_uint()
-    acenergy = tools.validate(
-        tools.calculate_value(acenergy, acenergysf), ">", 0)
+    try:
+        data["acva"] = float(round(acva, abs(acvasf)))
+    except OverflowError:
+        data["acva"] = None
+    try:
+        acvar = decoder.decode_16bit_int()
+        acvarsf = decoder.decode_16bit_int()
+        acvar = tools.calculate_value(acvar, acvarsf)
+        data["acvar"] = float(round(acvar, abs(acvarsf)))
+    except:
+        data["acvar"] = None
 
     try:
+        acpf = decoder.decode_16bit_int()
+        acpfsf = decoder.decode_16bit_int()
+        acpf = tools.calculate_value(acpf, acpfsf)
+        data["acpf"] = float(round(acpf, abs(acpfsf)))
+    except (OverflowError, struct.error, NameError):
+        data["acpf"] = None
+
+    try:
+        acenergy = decoder.decode_32bit_uint()
+        acenergysf = decoder.decode_16bit_uint()
+        acenergy = tools.validate(
+            tools.calculate_value(acenergy, acenergysf), ">", 0
+        )
         data["acenergy"] = round(acenergy * 0.001, 3)
-    except OverflowError:
+    except (OverflowError, struct.error):
         data["acenergy"] = None
 
-    dccurrent = decoder.decode_16bit_uint()
-    dccurrentsf = decoder.decode_16bit_int()
-    dccurrent = tools.calculate_value(dccurrent, dccurrentsf)
+    try:
+        dccurrent = decoder.decode_16bit_uint()
+        dccurrentsf = decoder.decode_16bit_int()
+        dccurrent = tools.calculate_value(dccurrent, dccurrentsf)
+        data["dccurrent"] = float(round(dccurrent, abs(dccurrentsf)))
+    except (OverflowError, struct.error, NameError):
+        data["dccurrent"] = None
 
-    data["dccurrent"] = float(round(dccurrent, abs(dccurrentsf)))
+    try:
+        dcvoltage = decoder.decode_16bit_uint()
+        dcvoltagesf = decoder.decode_16bit_int()
+        dcvoltage = tools.calculate_value(dcvoltage, dcvoltagesf)
+        data["dcvoltage"] = float(round(dcvoltage, abs(dcvoltagesf)))
+    except (OverflowError, struct.error, NameError):
+        data["dcvoltage"] = None
 
-    dcvoltage = decoder.decode_16bit_uint()
-    dcvoltagesf = decoder.decode_16bit_int()
-    dcvoltage = tools.calculate_value(dcvoltage, dcvoltagesf)
+    try:
+        dcpower = decoder.decode_16bit_int()
+        dcpowersf = decoder.decode_16bit_int()
+        dcpower = tools.calculate_value(dcpower, dcpowersf)
+        data["dcpower"] = float(round(dcpower, abs(dcpowersf)))
+    except (OverflowError, struct.error, NameError):
+        data["dcpower"] = None
 
-    data["dcvoltage"] = float(round(dcvoltage, abs(dcvoltagesf)))
+    try:
+        # skip register
+        decoder.skip_bytes(2)
+        tempsink = decoder.decode_16bit_int()
+        # skip 2 registers
+        decoder.skip_bytes(4)
+        tempsf = decoder.decode_16bit_int()
+        
+        tempsink = tools.calculate_value(tempsink, tempsf)
+        data["tempsink"] = round(tempsink, abs(tempsf))
+    except (OverflowError, struct.error, NameError):
+        data["tempsink"] = None
 
-    dcpower = decoder.decode_16bit_int()
-    dcpowersf = decoder.decode_16bit_int()
-    dcpower = tools.calculate_value(dcpower, dcpowersf)
-
-    data["dcpower"] = float(round(dcpower, abs(dcpowersf)))
-
-    # skip register
-    decoder.skip_bytes(2)
-
-    tempsink = decoder.decode_16bit_int()
-
-    # skip 2 registers
-    decoder.skip_bytes(4)
-
-    tempsf = decoder.decode_16bit_int()
-    tempsink = tools.calculate_value(tempsink, tempsf)
-
-    data["tempsink"] = round(tempsink, abs(tempsf))
-
-    status = decoder.decode_16bit_int()
-    data["status"] = status
-    statusvendor = decoder.decode_16bit_int()
-    data["statusvendor"] = statusvendor
+    try:
+        status = decoder.decode_16bit_int()
+        data["status"] = status
+        statusvendor = decoder.decode_16bit_int()
+        data["statusvendor"] = statusvendor
+    except (OverflowError, struct.error, NameError):
+        data["status"] = None
+        data["statusvendor"] = None
 
     return data

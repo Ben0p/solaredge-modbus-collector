@@ -118,8 +118,13 @@ def read_modbus_data(
     acpowerb = tools.calculate_value(acpowerb, acpowersf)
     acpowerc = tools.calculate_value(acpowerc, acpowersf)
 
-    data[prefix + "acpower"] = round(acpower, abs(acpowersf))
-    data[prefix + "acpowera"] = round(acpowera, abs(acpowersf))
+    try:
+        data[prefix + "acpower"] = float(round(acpower, abs(acpowersf)))
+        data[prefix + "acpowera"] = float(round(acpowera, abs(acpowersf)))
+    except OverflowError:
+        data[prefix + "acpower"] = None
+
+
     if env.THREE_PHASE:
         data[prefix + "acpowerb"] = round(acpowerb, abs(acpowersf))
         data[prefix + "acpowerc"] = round(acpowerc, abs(acpowersf))
@@ -130,14 +135,16 @@ def read_modbus_data(
     acvac = decoder.decode_16bit_int()
     acvasf = decoder.decode_16bit_int()
 
-    acva = tools.calculate_value(acva, acvasf)
-    acvaa = tools.calculate_value(acvaa, acvasf)
-    acvab = tools.calculate_value(acvab, acvasf)
-    acvac = tools.calculate_value(acvac, acvasf)
-
-    data[prefix + "acva"] = round(acva, abs(acvasf))
+    try:
+        acva = tools.calculate_value(acva, acvasf)
+        data[prefix + "acva"] = float(round(acva, abs(acvasf)))
+    except OverflowError:
+        data[prefix + "acva"] = None
     if env.THREE_PHASE:
-        data[prefix + "acvaa"] = round(acvaa, abs(acvasf))
+        acvaa = tools.calculate_value(acvaa, acvasf)
+        acvab = tools.calculate_value(acvab, acvasf)
+        acvac = tools.calculate_value(acvac, acvasf)
+        data[prefix + "acvaa"] = float(round(acvaa, abs(acvasf)))
         data[prefix + "acvab"] = round(acvab, abs(acvasf))
         data[prefix + "acvac"] = round(acvac, abs(acvasf))
 
@@ -152,8 +159,8 @@ def read_modbus_data(
     acvarb = tools.calculate_value(acvarb, acvarsf)
     acvarc = tools.calculate_value(acvarc, acvarsf)
 
-    data[prefix + "acvar"] = round(acvar, abs(acvarsf))
-    data[prefix + "acvara"] = round(acvara, abs(acvarsf))
+    data[prefix + "acvar"] = float(round(acvar, abs(acvarsf)))
+    data[prefix + "acvara"] = float(round(acvara, abs(acvarsf)))
     if env.THREE_PHASE:
         data[prefix + "acvarb"] = round(acvarb, abs(acvarsf))
         data[prefix + "acvarc"] = round(acvarc, abs(acvarsf))

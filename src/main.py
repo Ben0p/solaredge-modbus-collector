@@ -1,6 +1,7 @@
 import env
 import pymodbus
 import time
+import struct
 
 from utils import influx, modbus
 from modules import inverter, meter, battery, status
@@ -46,7 +47,7 @@ def run():
                 print("Retrived inverter data")
             except pymodbus.exceptions.ConnectionException:
                 break
-
+            
             if inverter_data:
                 influx.write(
                     write_api=influx_write_api,
@@ -59,6 +60,7 @@ def run():
                 print("Written inverter data to InfluxDB")
             else:
                 print("Error retrieving inverter data")
+
 
             time.sleep(0.5)
 
@@ -77,6 +79,9 @@ def run():
                 print("Retrived meter 1 data")
             except pymodbus.exceptions.ConnectionException:
                 break
+            except struct.error:
+                pass
+
 
             if m1_data:
                 influx.write(

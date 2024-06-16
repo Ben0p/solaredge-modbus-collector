@@ -1,5 +1,6 @@
 import influxdb_client
 from influxdb_client.client.write_api import SYNCHRONOUS
+import urllib3
 
 
 
@@ -41,4 +42,7 @@ def write(
     for key, value in data.items():
         p.field(key, value)
 
-    write_api.write(bucket=bucket, org=org, record=p)
+    try:
+        write_api.write(bucket=bucket, org=org, record=p)
+    except (influxdb_client.rest.ApiException, urllib3.exceptions.ReadTimeoutError, urllib3.exceptions.ConnectTimeoutError):
+        print("Error writing to InfluxDB")
