@@ -41,7 +41,7 @@ def read_modbus_data(
 
 	if not modbus_data.isError():
 		decoder = BinaryPayloadDecoder.fromRegisters(
-			modbus_data.registers, byteorder=Endian.Big, wordorder=Endian.Little
+			modbus_data.registers, byteorder=Endian.BIG, wordorder=Endian.LITTLE
 		)
 
 		# 0xE000 - 1 - Export control mode

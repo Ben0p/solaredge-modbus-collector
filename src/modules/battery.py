@@ -34,8 +34,8 @@ def read_modbus_data(
     if not modbus_data.isError():
         decoder = BinaryPayloadDecoder.fromRegisters(
             modbus_data.registers,
-            byteorder=Endian.Big,
-            wordorder=Endian.Little,
+            byteorder=Endian.BIG,
+            wordorder=Endian.LITTLE,
         )
 
         # 0x00 - 16 - manufacturer
@@ -96,7 +96,7 @@ def read_modbus_data(
             return False
 
         decoder = BinaryPayloadDecoder.fromRegisters(
-            storage_data.registers, byteorder=Endian.Big, wordorder=Endian.Little
+            storage_data.registers, byteorder=Endian.BIG, wordorder=Endian.LITTLE
         )
 
         # 0x6C - 2 - avg temp C

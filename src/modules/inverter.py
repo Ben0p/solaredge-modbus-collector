@@ -38,7 +38,7 @@ def read_modbus_data(
 
     decoder = BinaryPayloadDecoder.fromRegisters(
         modbus_data.registers,
-        byteorder=Endian.Big
+        byteorder=Endian.BIG
     )
     accurrent = decoder.decode_16bit_uint()
     accurrenta = decoder.decode_16bit_uint()
