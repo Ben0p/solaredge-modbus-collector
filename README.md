@@ -12,6 +12,7 @@ Collects data from a SolarEdge inverter, formats the data and writes to an Influ
 
 ## Running Using Docker
 See ["README_DOCKER.md"](README_DOCKER.md)
+or [DockerHub](https://hub.docker.com/repository/docker/ben0p/solaredge-modbus-collector/general)
 ## Prerequisites
 ### Common
 1. Ensure Modbus TCP is enabled on your inverter as above.
