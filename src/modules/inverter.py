@@ -1,5 +1,3 @@
-import env
-
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 import struct
@@ -15,6 +13,7 @@ Module for reading the inverter modbus values
 
 
 def read_modbus_data(
+        ENV,
         client,
         address: int,
         count: int,
@@ -54,7 +53,7 @@ def read_modbus_data(
     data["accurrent"] = round(accurrent, abs(accurrentsf))
     data["accurrenta"] = round(accurrenta, abs(accurrentsf))
 
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data["accurrentb"] = round(accurrentb, abs(accurrentsf))
         data["accurrentc"] = round(accurrentc, abs(accurrentsf))
 
@@ -75,7 +74,7 @@ def read_modbus_data(
 
     data["acvoltagean"] = round(acvoltagean, abs(acvoltagesf))
 
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data["acvoltageab"] = round(acvoltageab, abs(acvoltagesf))
         data["acvoltagebc"] = round(acvoltagebc, abs(acvoltagesf))
         data["acvoltageca"] = round(acvoltageca, abs(acvoltagesf))

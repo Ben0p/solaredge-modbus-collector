@@ -1,5 +1,3 @@
-import env
-
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 
@@ -14,6 +12,7 @@ Module for reading the modbus values for a meter
 
 
 def read_modbus_data(
+        ENV,
         client,
         address: int,
         count: int,
@@ -54,7 +53,7 @@ def read_modbus_data(
          "accurrent"] = round(accurrent, abs(accurrentsf))
     data[prefix +
          "accurrenta"] = round(accurrenta, abs(accurrentsf))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix +
              "accurrentb"] = round(accurrentb, abs(accurrentsf))
         data[prefix +
@@ -86,7 +85,7 @@ def read_modbus_data(
          "acvoltageln"] = round(acvoltageln, abs(acvoltagesf))
     data[prefix +
          "acvoltagean"] = round(acvoltagean, abs(acvoltagesf))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix +
              "acvoltagebn"] = round(acvoltagebn, abs(acvoltagesf))
         data[prefix +
@@ -125,7 +124,7 @@ def read_modbus_data(
         data[prefix + "acpower"] = None
 
 
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "acpowerb"] = round(acpowerb, abs(acpowersf))
         data[prefix + "acpowerc"] = round(acpowerc, abs(acpowersf))
 
@@ -140,7 +139,7 @@ def read_modbus_data(
         data[prefix + "acva"] = float(round(acva, abs(acvasf)))
     except OverflowError:
         data[prefix + "acva"] = None
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         acvaa = tools.calculate_value(acvaa, acvasf)
         acvab = tools.calculate_value(acvab, acvasf)
         acvac = tools.calculate_value(acvac, acvasf)
@@ -161,7 +160,7 @@ def read_modbus_data(
 
     data[prefix + "acvar"] = float(round(acvar, abs(acvarsf)))
     data[prefix + "acvara"] = float(round(acvara, abs(acvarsf)))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "acvarb"] = round(acvarb, abs(acvarsf))
         data[prefix + "acvarc"] = round(acvarc, abs(acvarsf))
 
@@ -178,7 +177,7 @@ def read_modbus_data(
 
     data[prefix + "acpf"] = round(acpf, abs(acpfsf))
     data[prefix + "acpfa"] = round(acpfa, abs(acpfsf))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "acpfb"] = round(acpfb, abs(acpfsf))
         data[prefix + "acpfc"] = round(acpfc, abs(acpfsf))
 
@@ -217,12 +216,12 @@ def read_modbus_data(
 
     data[prefix + "exported"] = round(exported * 0.001, 3)
     data[prefix + "exporteda"] = round(exporteda * 0.001, 3)
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "exportedb"] = round(exportedb * 0.001, 3)
         data[prefix + "exportedc"] = round(exportedc * 0.001, 3)
     data[prefix + "imported"] = round(imported * 0.001, 3)
     data[prefix + "importeda"] = round(importeda * 0.001, 3)
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "importedb"] = round(importedb * 0.001, 3)
         data[prefix + "importedc"] = round(importedc * 0.001, 3)
 
@@ -249,7 +248,7 @@ def read_modbus_data(
          "exportedva"] = round(exportedva, abs(energyvasf))
     data[prefix +
          "exportedvaa"] = round(exportedvaa, abs(energyvasf))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix +
              "exportedvab"] = round(exportedvab, abs(energyvasf))
         data[prefix +
@@ -258,7 +257,7 @@ def read_modbus_data(
          "importedva"] = round(importedva, abs(energyvasf))
     data[prefix +
          "importedvaa"] = round(importedvaa, abs(energyvasf))
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix +
              "importedvab"] = round(importedvab, abs(energyvasf))
         data[prefix +
@@ -304,7 +303,7 @@ def read_modbus_data(
     data[prefix + "importvarhq1a"] = round(
         importvarhq1a, abs(energyvarsf)
     )
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "importvarhq1b"] = round(
             importvarhq1b, abs(energyvarsf)
         )
@@ -316,7 +315,7 @@ def read_modbus_data(
     data[prefix + "importvarhq2a"] = round(
         importvarhq2a, abs(energyvarsf)
     )
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "importvarhq2b"] = round(
             importvarhq2b, abs(energyvarsf)
         )
@@ -328,7 +327,7 @@ def read_modbus_data(
     data[prefix + "importvarhq3a"] = round(
         importvarhq3a, abs(energyvarsf)
     )
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "importvarhq3b"] = round(
             importvarhq3b, abs(energyvarsf)
         )
@@ -340,7 +339,7 @@ def read_modbus_data(
     data[prefix + "importvarhq4a"] = round(
         importvarhq4a, abs(energyvarsf)
     )
-    if env.THREE_PHASE:
+    if ENV.THREE_PHASE:
         data[prefix + "importvarhq4b"] = round(
             importvarhq4b, abs(energyvarsf)
         )

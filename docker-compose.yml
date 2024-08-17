@@ -1,0 +1,15 @@
+services:
+  influxdb:
+    image: influxdb
+    ports:
+      - "8086:8086"
+
+  solaredge-mudbus-collector:
+    image: ben0p/solaredge-modbus-collector
+    container_name: solaredge_modbus_collector
+    environment:
+        - INVERTER_IP=10.0.0.10
+        - INFLUX_BUCKET=my_bucket
+        - INFLUX_ORG=my_org
+        - INFLUX_TOKEN=my_api_token
+        - INFLUX_URL=http://influxdb:8086/

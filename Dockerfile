@@ -8,8 +8,8 @@ COPY src /app/
 
 WORKDIR /app
 
-CMD [ "python", "main.py"]
+CMD [ "python", "main.py", '--env', 'docker']
 
 
-#docker build ben0p/solaredge-modbus-collector
+#docker build -t ben0p/solaredge-modbus-collector .
 #docker push ben0p/solaredge-modbus-collector

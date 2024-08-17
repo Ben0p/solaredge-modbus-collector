@@ -1,5 +1,3 @@
-import env
-
 from pymodbus.constants import Endian
 from pymodbus.payload import BinaryPayloadDecoder
 from influxdb_client.rest import ApiException
@@ -14,6 +12,7 @@ Process the inverter status registers
 
 
 def read_modbus_data(
+		ENV,
         client,
         address: int,
         slave: int
@@ -24,9 +23,9 @@ def read_modbus_data(
     
 	data = {}
     
-	if env.BATT_1:
+	if ENV.BATT_1:
 		count = 0x12  # Read storedge block as well
-	elif env.METER_1:
+	elif ENV.METER_1:
 		count = 4  # Just read export control block
 	else:
 		return True  # Nothing to read here
@@ -68,7 +67,7 @@ def read_modbus_data(
 			decoder.decode_32bit_float(), 3
 		)
 
-		if not env.BATT_1:
+		if not ENV.BATT_1:
 			# Done with the export control block
 			return True
 

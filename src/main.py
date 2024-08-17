@@ -1,8 +1,9 @@
-import env
+import os
 import pymodbus
 import time
 import struct
 
+from services import environmentservice
 from utils import influx, modbus
 from modules import inverter, meter, battery, status
 
@@ -17,16 +18,18 @@ Modbus must be enabled on inverter
 
 
 def run():
-
+    ENV = environmentservice.env()
+    if not ENV.SUCCESS:
+        exit(0)
     while True:
         # Initialize modbus connection
-        modbus_client = modbus.connect(env.INVERTER_IP, env.MODBUS_PORT)
+        modbus_client = modbus.connect(ENV.INVERTER_IP, ENV.MODBUS_PORT)
         print("Connected to Inverter Modbus TCP")
 
 
         # Initialize InfluxDB connection
         influx_write_api = influx.connect(
-            env.INFLUX_URL, env.INFLUX_TOKEN, env.INFLUX_ORG)
+            ENV.INFLUX_URL, ENV.INFLUX_TOKEN, ENV.INFLUX_ORG)
         print("Connected to InfluxDB")
 
 
@@ -39,10 +42,11 @@ def run():
             try:
                 # Collect and convert inverter data
                 inverter_data = inverter.read_modbus_data(
+                    ENV,
                     client=modbus_client,
                     address=40071,
                     count=38,
-                    slave=env.SLAVE
+                    slave=ENV.SLAVE
                 )
                 print("Retrived inverter data")
             except pymodbus.exceptions.ConnectionException:
@@ -51,8 +55,8 @@ def run():
             if inverter_data:
                 influx.write(
                     write_api=influx_write_api,
-                    bucket=env.INFLUX_BUCKET,
-                    org=env.INFLUX_ORG,
+                    bucket=ENV.INFLUX_BUCKET,
+                    org=ENV.INFLUX_ORG,
                     measurement='solaredge',
                     tag='inverter',
                     data=inverter_data
@@ -70,10 +74,11 @@ def run():
             try:
                 # Collect and convert meter 1 data
                 m1_data = meter.read_modbus_data(
+                    ENV,
                     client=modbus_client,
                     address=40190,
                     count=103,
-                    slave=env.SLAVE,
+                    slave=ENV.SLAVE,
                     prefix="m1_"
                 )
                 print("Retrived meter 1 data")
@@ -86,8 +91,8 @@ def run():
             if m1_data:
                 influx.write(
                     write_api=influx_write_api,
-                    bucket=env.INFLUX_BUCKET,
-                    org=env.INFLUX_ORG,
+                    bucket=ENV.INFLUX_BUCKET,
+                    org=ENV.INFLUX_ORG,
                     measurement='solaredge',
                     tag='m1',
                     data=m1_data
@@ -107,7 +112,7 @@ def run():
                     client=modbus_client,
                     address=0xE100,
                     count=0x4C,
-                    slave=env.SLAVE,
+                    slave=ENV.SLAVE,
                     prefix="b1_"
                 )
                 print("Retrived battery 1 data")
@@ -117,8 +122,8 @@ def run():
             if b1_data:
                 influx.write(
                     write_api=influx_write_api,
-                    bucket=env.INFLUX_BUCKET,
-                    org=env.INFLUX_ORG,
+                    bucket=ENV.INFLUX_BUCKET,
+                    org=ENV.INFLUX_ORG,
                     measurement='solaredge',
                     tag='b1',
                     data=b1_data
@@ -134,9 +139,10 @@ def run():
             #========#
             try:
                 status_data = status.read_modbus_data(
+                    ENV,
                     client=modbus_client,
                     address=0xE000,
-                    slave=env.SLAVE,
+                    slave=ENV.SLAVE,
                 )
             except pymodbus.exceptions.ConnectionException:
                 break
@@ -144,8 +150,8 @@ def run():
             if status_data:
                 influx.write(
                     write_api=influx_write_api,
-                    bucket=env.INFLUX_BUCKET,
-                    org=env.INFLUX_ORG,
+                    bucket=ENV.INFLUX_BUCKET,
+                    org=ENV.INFLUX_ORG,
                     measurement='solaredge',
                     tag='status',
                     data=status_data
@@ -155,9 +161,9 @@ def run():
                 print("Error retrieving status data")
 
 
-            print(f"Sleeping for {env.POLLING_INTERVAL}s")
+            print(f"Sleeping for {ENV.POLLING_INTERVAL}s")
             print("-"*50)
-            time.sleep(env.POLLING_INTERVAL)
+            time.sleep(ENV.POLLING_INTERVAL)
         print("Modbus connection error")
         time.sleep(10)
 		
